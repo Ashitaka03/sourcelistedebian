@@ -1,0 +1,18 @@
+# Base
+FROM debian
+# Installer OpenSSH Server et de rsync VERSION SCYTALE
+RUN echo "deb http://deb.debian.org/debian/ trixie main" >> /etc/apt/sources.list
+RUN rm /etc/apt/sources.list.d/*
+RUN apt update
+RUN apt -y full-upgrade
+RUN apt -y install openssh-server rsync
+# Créer l'utilisateur et définir l'empreinte de son mot de passe
+RUN useradd partimag
+RUN sed -i 's|partimag:!|partimag:$6$ms54HTml$rXLiBhSMcPhOo450S2yFF5.fxO9OaOlHsQtywM3ubfMbZH/xnon1LztmBwEwI7ePwQnRRRs1T18gqnSs38Rot1|' /etc/shadow
+# Créer le répertoire à partager
+RUN mkdir -p /home/partimag/
+VOLUME /home/partimag/
+# Exposer le port 22
+EXPOSE 22
+# Démarrer le service au démarrage du conteneur
+CMD ["/usr/sbin/sshd", "-D"]
